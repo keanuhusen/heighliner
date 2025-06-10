@@ -1,0 +1,73 @@
+// Prisma schema for multi-tenant hotel booking platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Hotel {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  themeColor  String?  @default("#000000")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rooms       Room[]
+  bookings    Booking[]
+  users       User[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  role      Role     @default(GUEST)
+  hotel     Hotel?   @relation(fields: [hotelId], references: [id])
+  hotelId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings  Booking[]
+}
+
+enum Role {
+  GUEST
+  HOTEL_ADMIN
+  SUPER_ADMIN
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  hotel       Hotel    @relation(fields: [hotelId], references: [id])
+  hotelId     String
+  name        String
+  description String?
+  price       Int      // price in cents
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  hotelId   String
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    String
+  guest     User     @relation(fields: [guestId], references: [id])
+  guestId   String
+  startDate DateTime
+  endDate   DateTime
+  total     Int      // total price in cents
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
