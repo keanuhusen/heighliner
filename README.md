@@ -2,6 +2,9 @@
 
 This is a modern SaaS platform for hotel booking and reservation management built with Next.js, Prisma, and PostgreSQL.
 
+This project uses the **Next.js App Router** via the `/app` directory. The legacy
+`pages` folder remains only for API routes.
+
 ## Development
 
 1. Install dependencies:
